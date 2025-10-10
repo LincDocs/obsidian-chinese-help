@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   deploy-gh-pages:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores # 使用16GB内存的 runner, 原 'ubuntu-latest'
     steps:          
       - name: 环境 - 构建库
         uses: actions/checkout@v4
@@ -105,9 +105,14 @@ jobs:
           rm -f ./src/.vuepress/theme_cover.js
           pnpm run gen-config
 
+      - name: 环境 - 增加交换空间
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10 # 创建 10GB 的交换空间，可以根据需要调整
+
       - name: 文档 - 构建
         env:
-          NODE_OPTIONS: --max_old_space_size=6144
+          NODE_OPTIONS: --max_old_space_size=20480
         run: |-
           node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
