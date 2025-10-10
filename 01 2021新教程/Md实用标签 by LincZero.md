@@ -67,7 +67,7 @@ aliases: []
 
 | 标签      | 作用                                                         | 使用建议                                                     |
 | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ruby + rt | <ruby>国家<rt>Nation</ruby> 或 <ruby>国家<rt>Nation</rt></ruby> | 技术翻译文档里比较常见的（Typora复制有bug）<br />（这个最好字体在18px以上效果较好） |
+| ruby + rt | <ruby>国家<rt>Nation</rt></ruby> | 技术翻译文档里比较常见的（Typora复制有bug）<br />（这个最好字体在18px以上效果较好） |
 | kbd       | <kbd>Ctrl</kbd> + <kbd>C</kbd><br /><kbd>Ctrl Shift</kbd> + <kbd>V</kbd> | 主要是快捷键用<br />觉得原生的样式有点一般的，也可以调整一下css |
 | u         | <u>下滑线</u>                                                |                                                              |
 | center    | <center>居中</center><br />（正文生效）                      | 非必要，勿使用                                               |
