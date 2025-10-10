@@ -285,7 +285,7 @@ same:: [[obsidan插件开发与翻译]]
 [[Enhancing export（增强导出插件）]]
 
 [[Enhancing mindmap（思维导图插件）]]
-- [在OB中绘制思维导图（Enhancing mindmap插件介绍） by 软通达]]
+- [[在OB中绘制思维导图（Enhancing mindmap插件介绍） by 软通达]]
 - [[Enchancing mindmap实现思维导图自由 by Wyatt]]
 
 [[ePub Reader（EPUB阅读插件）]]
