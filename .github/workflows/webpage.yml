@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   deploy-gh-pages:
-    runs-on: ubuntu-latest-8-cores # 使用16GB内存的 runner, 原 'ubuntu-latest'
+    runs-on: ubuntu-latest # ubuntu-latest-8-cores 使用16GB内存的 runner，但是这个runner要排队
     steps:          
       - name: 环境 - 构建库
         uses: actions/checkout@v4
