@@ -141,6 +141,7 @@ jobs:
           sed -i -E 's/("CALC_REPO_NAME": "[^"]+)(")/\1\/01 2021新教程\2/' ./scripts/git_config.json
           echo "Updated git_config.json for second build:"
           cat ./scripts/git_config.json
+          pnpm run gen-config
 
           mv ./src_tmp/"01 2021新教程"/* ./src/
           node -e 'console.log(v8.getHeapStatistics())'
