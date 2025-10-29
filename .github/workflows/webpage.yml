@@ -119,17 +119,40 @@ jobs:
       #    > src/.vuepress/dist/.nojekyll
 
       # [!code focus-start]
-      - name: 文档 - 分批构建
-        # ！！！重要：在这里修改你要分批构建的文件夹列表！！！
-        # 每个文件夹名占一行，可以包含空格。
+      - name: 文档 - 文件夹放弃构建
         env:
           DOC_FOLDERS: |
             01 2021新教程
+        run: |
+          cd src
+          
+          # 创建一个临时目录来存放不需要构建的文件夹
+          mkdir ../_delete_docs
+
+          # 将所有要禁用构建的文件夹移到临时目录
+          # 使用 while read 循环来正确处理带空格的文件夹名
+          echo "$DOC_FOLDERS" | while IFS= read -r folder; do
+            # 跳过空行
+            if [ -z "$folder" ]; then continue; fi
+            
+            if [ -d "$folder" ]; then
+              echo "Moving '$folder' to delete directory."
+              mv "$folder" ../_delete_docs/
+            else
+              echo "Warning: Folder '$folder' not found, skipping."
+            fi
+          done
+
+      # [!code focus-start]
+      - name: 文档 - 文件夹分批构建
+        # ！！！重要：在这里修改你要分批构建的文件夹列表，个文件夹名占一行！！！
+        env:
+          DOC_FOLDERS: |
             02 ob笔记分享
             03 教程
             06 ob官方帮助文档 (节选)
             08 高阶教程
-          NODE_OPTIONS: --max_old_space_size=6144 # 为标准 runner 的 7GB 内存留出一些余量
+          NODE_OPTIONS: --max_old_space_size=20480
         run: |
           cd src
           
