@@ -124,9 +124,11 @@ jobs:
         # 每个文件夹名占一行，可以包含空格。
         env:
           DOC_FOLDERS: |
-            folder with space A
-            another folder
-            folder-C
+            01 2021新教程
+            02 ob笔记分享
+            03 教程
+            06 ob官方帮助文档 (节选)
+            08 高阶教程
           NODE_OPTIONS: --max_old_space_size=6144 # 为标准 runner 的 7GB 内存留出一些余量
         run: |
           cd src
