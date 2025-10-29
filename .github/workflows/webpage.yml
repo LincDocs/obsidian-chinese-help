@@ -143,6 +143,10 @@ jobs:
           cat ./scripts/git_config.json
           pnpm run gen-config
 
+          # rootSidebar 插件似乎无法处理根base与虚拟base不等同的情况
+          sed -i 's/rootSidebar,/\/\/ rootSidebar,/' src/.vuepress/config_plugins.ts
+          cat src/.vuepress/config_plugins.ts
+
           mv ./src_tmp/"01 2021新教程"/* ./src/
           node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
