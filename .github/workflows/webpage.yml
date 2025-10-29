@@ -152,6 +152,8 @@ jobs:
             #03 教程
             #06 ob官方帮助文档（节选）
             #08 高阶教程
+            98 模板
+            99 存档
           NODE_OPTIONS: --max_old_space_size=20480
         run: |
           cd src
