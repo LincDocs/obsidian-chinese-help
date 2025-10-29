@@ -122,7 +122,7 @@ jobs:
       - name: 文档 - 文件夹放弃构建
         env:
           DOC_FOLDERS: |
-            01 2021新教程
+            #01 2021新教程
         run: |
           cd src
           
