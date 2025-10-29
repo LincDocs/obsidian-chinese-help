@@ -94,7 +94,7 @@ jobs:
             rm -rf temp_repo
             echo "without docs"
           fi
-          
+
       # [!code] 根据实际情况修改 (需要在仓库配置写入以及和文档仓库clone这两个步骤的后面)
       - name: 配置 - 设置
         working-directory: ./
@@ -105,119 +105,53 @@ jobs:
           rm -f ./src/.vuepress/theme_cover.js
           pnpm run gen-config
 
-      #- name: 环境 - 增加交换空间
-      #  uses: pierotofy/set-swap-space@master
-      #  with:
-      #    swap-size-gb: 10 # 创建 10GB 的交换空间，可以根据需要调整
+      # - name: 环境 - 增加交换空间
+      #   uses: pierotofy/set-swap-space@master
+      #   with:
+      #     swap-size-gb: 10 # 创建 10GB 的交换空间，可以根据需要调整
 
-      #- name: 文档 - 构建
-      #  env:
-      #    NODE_OPTIONS: --max_old_space_size=20480
-      #  run: |-
-      #    node -e 'console.log(v8.getHeapStatistics())'
-      #    pnpm run docs:build
-      #    > src/.vuepress/dist/.nojekyll
-
-      # [!code focus-start]
-      - name: 文档 - 文件夹放弃构建
-        env:
-          DOC_FOLDERS: |
-            #01 2021新教程
+      - name: 文档 - 构建分批构建 - 起始
+        working-directory: ./
         run: |
-          cd src
-          
-          # 创建一个临时目录来存放不需要构建的文件夹
-          mkdir ../_delete_docs
+          mkdir ./src_tmp # 文档缓存
+          mkdir ./dist_tmp # 编译结果缓存
+          mv ./src/"01 2021新教程" ./src_tmp/
 
-          # 将所有要禁用构建的文件夹移到临时目录
-          # 使用 while read 循环来正确处理带空格的文件夹名
-          echo "$DOC_FOLDERS" | while IFS= read -r folder; do
-            # 跳过空行
-            if [ -z "$folder" ]; then continue; fi
-            
-            if [ -d "$folder" ]; then
-              echo "Moving '$folder' to delete directory."
-              mv "$folder" ../_delete_docs/
-            else
-              echo "Warning: Folder '$folder' not found, skipping."
-            fi
-          done
-
-      # [!code focus-start]
-      - name: 文档 - 文件夹分批构建
-        # ！！！重要：在这里修改你要分批构建的文件夹列表，个文件夹名占一行！！！
+      - name: 文档 - 构建分批构建 1
         env:
-          DOC_FOLDERS: |
-            #02 ob笔记分享
-            #03 教程
-            #06 ob官方帮助文档（节选）
-            #08 高阶教程
-            98 模板
-            99 存档
           NODE_OPTIONS: --max_old_space_size=20480
         run: |
-          cd src
-          
-          # 创建一个临时目录来存放不需要构建的文件夹
-          mkdir ../_temp_docs
-          
-          # 将所有要分批构建的文件夹移到临时目录
-          # 使用 while read 循环来正确处理带空格的文件夹名
-          echo "$DOC_FOLDERS" | while IFS= read -r folder; do
-            # 跳过空行
-            if [ -z "$folder" ]; then continue; fi
-            
-            if [ -d "$folder" ]; then
-              echo "Moving '$folder' to temp directory."
-              mv "$folder" ../_temp_docs/
-            else
-              echo "Warning: Folder '$folder' not found, skipping."
-            fi
-          done
-          
-          # 首次构建（处理根目录下的散文件和未被移动的文件夹）
-          echo "--- Building root files and other folders ---"
+          node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
-          # 检查 dist 目录是否存在，避免 mv 失败
-          if [ -d ".vuepress/dist" ]; then
-            mv .vuepress/dist ../dist-final
-          else
-            echo "Error: Initial build failed, '.vuepress/dist' not found."
-            exit 1
-          fi
-          echo "--- Finished building root files ---"
+          > src/.vuepress/dist/.nojekyll
+          mv ./src/.vuepress/dist/* ./dist_tmp/
 
-          # 逐个构建之前移出的文件夹 # 后来测试发现不行，不能直接合并。要真正完整部署多个不同base的网站才行
-          echo "$DOC_FOLDERS" | while IFS= read -r folder; do
-            if [ -z "$folder" ]; then continue; fi
-
-            if [ -d "../_temp_docs/$folder" ]; then
-              echo "--- Building '$folder' ---"
-              
-              # 将当前要构建的文件夹移回来
-              mv "../_temp_docs/$folder" .
-              
-              # 运行构建
-              pnpm run docs:build
-              
-              # 合并构建结果
-              if [ -d ".vuepress/dist" ]; then
-                echo "--- Merging '$folder' build results ---"
-                rsync -av .vuepress/dist/ ../dist-final/
-              else
-                echo "Error: Build for '$folder' failed, '.vuepress/dist' not found."
-                # 即使本次构建失败，也继续尝试下一个，或者你可以选择在这里退出 `exit 1`
-              fi
-              
-              # 构建完成后，将文件夹移回临时目录，为下一次构建做准备
-              mv "$folder" ../_temp_docs/
-              
-              echo "--- Finished building '$folder' ---"
-            fi
-          done
+      - name: 文档 - 构建分批构建 2
+        env:
+          NODE_OPTIONS: --max_old_space_size=20480
+        working-directory: ./
+        run: |
+          # 查找 "CALC_REPO_NAME": "XXXX" 这一行，并将其替换为 "CALC_REPO_NAME": "XXXX/01 2021新教程"
+          # 使用 `sed` 命令来安全地处理这个替换，它会处理 JSON 中可能存在的逗号
+          # -E 使用扩展正则表达式, s/pattern/replacement/ 语法
+          # ([^"]+) 捕获双引号之间的仓库名
+          # \1/01 2021新教程 在捕获的仓库名后追加子目录
+          sed -i -E 's/("CALC_REPO_NAME": "[^"]+)(")/\1\/01 2021新教程\2/' ./scripts/git_config.json
+          echo "Updated git_config.json for second build:"
+          cat ./scripts/git_config.json
           
-          # 清理临时目录
-          rm -rf ../_temp_docs
+          find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} +
+          mv ./src_tmp/"01 2021新教程" ./src/
+          node -e 'console.log(v8.getHeapStatistics())'
+          pnpm run docs:build
+          mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程"
+          # rsync -av ./src/.vuepress/dist/ ./dist-tmp/
+
+      - name: 文档 - 构建分批构建 - 结束
+        working-directory: ./
+        run: |
+          rm -rf ./src/.vuepress/dist/*
+          mv ./dist_tmp/* ./src/.vuepress/dist/
 
       - name: 文档 - 部署
         uses: JamesIves/github-pages-deploy-action@v4
