@@ -148,10 +148,10 @@ jobs:
         # ！！！重要：在这里修改你要分批构建的文件夹列表，个文件夹名占一行！！！
         env:
           DOC_FOLDERS: |
-            02 ob笔记分享
-            03 教程
-            06 ob官方帮助文档 (节选)
-            08 高阶教程
+            #02 ob笔记分享
+            #03 教程
+            #06 ob官方帮助文档（节选）
+            #08 高阶教程
           NODE_OPTIONS: --max_old_space_size=20480
         run: |
           cd src
@@ -185,7 +185,7 @@ jobs:
           fi
           echo "--- Finished building root files ---"
 
-          # 逐个构建之前移出的文件夹
+          # 逐个构建之前移出的文件夹 # 后来测试发现不行，不能直接合并。要真正完整部署多个不同base的网站才行
           echo "$DOC_FOLDERS" | while IFS= read -r folder; do
             if [ -z "$folder" ]; then continue; fi
 
