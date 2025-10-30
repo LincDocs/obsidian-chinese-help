@@ -132,28 +132,25 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=20480
         working-directory: ./
         run: |
+          # 弃用，还是要同base
           # 修改base
           # 查找 "CALC_REPO_NAME": "XXXX" 这一行，并将其替换为 "CALC_REPO_NAME": "XXXX/01 2021新教程"
           # 使用 `sed` 命令来安全地处理这个替换，它会处理 JSON 中可能存在的逗号
           # -E 使用扩展正则表达式, s/pattern/replacement/ 语法
           # ([^"]+) 捕获双引号之间的仓库名
           # \1/01 2021新教程 在捕获的仓库名后追加子目录
-          sed -i -E 's/("CALC_REPO_NAME": "[^"]+)(")/\1\/01 2021新教程\2/' ./scripts/git_config.json
-          echo "Updated git_config.json for second build:"
-          cat ./scripts/git_config.json
-          pnpm run gen-config
+          # sed -i -E 's/("CALC_REPO_NAME": "[^"]+)(")/\1\/01 2021新教程\2/' ./scripts/git_config.json
+          # echo "Updated git_config.json for second build:"
+          # cat ./scripts/git_config.json
+          # pnpm run gen-config
 
-          # rootSidebar 插件似乎无法处理根base与虚拟base不等同的情况
-          sed -i 's/rootSidebar,/\/\/ rootSidebar,/' src/.vuepress/config_plugins.ts
-          cat src/.vuepress/config_plugins.ts
-
-          mv ./src_tmp/"01 2021新教程"/* ./src/
+          mv ./src_tmp/"01 2021新教程"/ ./src/
           node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
           mkdir -p ./dist_tmp/"01 2021新教程"
-          mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程"
+          # mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程" # 移动
+          rsync -av ./src/.vuepress/dist/ ./dist-tmp/ # 合并
           # find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} +
-          # rsync -av ./src/.vuepress/dist/ ./dist-tmp/
 
       - name: 文档 - 构建分批构建 - 结束
         working-directory: ./
