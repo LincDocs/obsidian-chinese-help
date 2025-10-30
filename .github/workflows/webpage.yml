@@ -124,15 +124,15 @@ jobs:
           node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
           > src/.vuepress/dist/.nojekyll
-          mv ./src/.vuepress/dist/* ./dist_tmp/
-          find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} +
+          mv ./src/.vuepress/dist/* ./dist_tmp/ # 移动产物
+          find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} + # 删除编译过的文档
 
       - name: 文档 - 构建分批构建 2
         env:
           NODE_OPTIONS: --max_old_space_size=20480
         working-directory: ./
         run: |
-          # 弃用，还是要同base
+          # 弃用，还是要同base。vuepress 要设置base和实际base一致，否则会有个重定向的bug
           # 修改base
           # 查找 "CALC_REPO_NAME": "XXXX" 这一行，并将其替换为 "CALC_REPO_NAME": "XXXX/01 2021新教程"
           # 使用 `sed` 命令来安全地处理这个替换，它会处理 JSON 中可能存在的逗号
@@ -147,10 +147,21 @@ jobs:
           mv ./src_tmp/"01 2021新教程"/ ./src/
           node -e 'console.log(v8.getHeapStatistics())'
           pnpm run docs:build
-          mkdir -p ./dist_tmp/"01 2021新教程"
-          # mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程" # 移动
-          rsync -av ./src/.vuepress/dist/ ./dist-tmp/ # 合并
-          # find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} +
+
+          echo "--- Content of dist_tmp before final move ---"
+          ls -R ./dist_tmp
+          echo "--- Content of dist before final move ---"
+          ls -R ./src/.vuepress/dist
+
+          # mkdir -p ./dist_tmp/"01 2021新教程" # 移动产物1
+          # mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程" # 移动产物2
+          rsync -av --ignore-existing ./src/.vuepress/dist/ ./dist-tmp/ # 合并产物 (设置了不覆盖策略)
+          # find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} + # 删除编译过的文档
+
+          echo "--- Content of dist_tmp after final move ---"
+          ls -R ./dist_tmp
+          echo "--- Content of dist after final move ---"
+          ls -R ./src/.vuepress/dist
 
       - name: 文档 - 构建分批构建 - 结束
         working-directory: ./
