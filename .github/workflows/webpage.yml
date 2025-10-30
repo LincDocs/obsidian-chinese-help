@@ -155,7 +155,7 @@ jobs:
 
           # mkdir -p ./dist_tmp/"01 2021新教程" # 移动产物1
           # mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程" # 移动产物2
-          rsync -av --ignore-existing ./src/.vuepress/dist/ ./dist-tmp/ # 合并产物 (设置了不覆盖策略)
+          rsync -av --ignore-existing ./src/.vuepress/dist/ ./dist_tmp/ # 合并产物 (--ignore-existing 可设置不覆盖策略)
           # find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} + # 删除编译过的文档
 
           echo "--- Content of dist_tmp after final move ---"
