@@ -149,9 +149,9 @@ jobs:
           pnpm run docs:build
 
           echo "--- Content of dist_tmp before final move ---"
-          ls -R ./dist_tmp
+          ls -lA ./dist_tmp
           echo "--- Content of dist before final move ---"
-          ls -R ./src/.vuepress/dist
+          ls -lA ./src/.vuepress/dist
 
           # mkdir -p ./dist_tmp/"01 2021新教程" # 移动产物1
           # mv ./src/.vuepress/dist/* ./dist_tmp/"01 2021新教程" # 移动产物2
@@ -159,9 +159,9 @@ jobs:
           # find ./src/ -mindepth 1 -maxdepth 1 ! -name ".vuepress" -exec rm -rf {} + # 删除编译过的文档
 
           echo "--- Content of dist_tmp after final move ---"
-          ls -R ./dist_tmp
+          ls -lA ./dist_tmp
           echo "--- Content of dist after final move ---"
-          ls -R ./src/.vuepress/dist
+          ls -lA ./src/.vuepress/dist
 
       - name: 文档 - 构建分批构建 - 结束
         working-directory: ./
