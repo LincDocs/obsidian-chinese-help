@@ -1,4 +1,0 @@
-User-agent:*
-Disallow:
-
-Sitemap: https://LincDocs.github.io/obsidian-chinese-help/01 2021新教程/sitemap.xml
